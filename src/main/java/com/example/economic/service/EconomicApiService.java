@@ -44,7 +44,7 @@ public class EconomicApiService {
     public List<Customer> getCustomers() {
         ResponseEntity<CustomerCollectionResponse> response = restTemplate.exchange(
                 apiBaseUrl + "/customers",
-            HttpMethod.GET,
+                HttpMethod.GET,
                 getDemoHTTPHeader(),
                 CustomerCollectionResponse.class
         );
@@ -126,7 +126,7 @@ public class EconomicApiService {
 
 
 
-    private HttpEntity getDemoHTTPHeader(){
+    private HttpEntity<?> getDemoHTTPHeader(){
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-AppSecretToken", appSecretToken);
         headers.set("X-AgreementGrantToken", agreementGrantToken);
