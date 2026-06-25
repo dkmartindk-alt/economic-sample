@@ -1,0 +1,28 @@
+<th:block th:replace="~{layout/default :: main-layout(~{:: #page-content})}">
+    <main id="page-content">
+        <h2>Customers</h2>
+        <p>List of e-conomic customers, click on a customer to see additional information for it or click the email to send a email to the customer.</p>
+        <table th:unless="${#lists.isEmpty(customers)}">
+            <thead>
+            <tr>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Active</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="customer : ${customers}">
+                <td><a th:href="@{|/customers/${customer.customerNumber}|}"><span th:text="${customer.customerNumber}"></span></a></td>
+                <td><a th:href="@{|/customers/${customer.customerNumber}|}"><span th:text="${customer.name}"></span></a></td>
+                <td><a th:href="@{|mailto:${customer.email}|}"><span th:text="${customer.email}"></span></a></td>
+                <td><span th:text="${(customer.barred ?: false) ? 'No' : 'Yes'}"></span></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${#lists.isEmpty(customers)}">
+            <p>No customers found.</p>
+        </div>
+    </main>
+</th:block>

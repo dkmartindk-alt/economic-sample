@@ -1,0 +1,38 @@
+<th:block th:replace="~{layout/default :: main-layout(~{:: #page-content})}">
+    <main id="page-content">
+        <h1><span th:text="${customer.name ?: 'Unknown'}"></span> (<span th:text="${customer.customerNumber ?: 'Unknown'}"></span>)</h1>
+        <div class="kpicontainer">
+            <div class="kpi kpi-date"><span class="kpiheader">First invoice</span><span class="kpivalue" th:text="${customerInvoiceTotals.minDate ?: 'Never'}"></span></div>
+            <div class="kpi kpi-date-latest"><span class="kpiheader">Latest invoice</span><span class="kpivalue" th:text="${customerInvoiceTotals.maxDate ?: 'Never'}"></span></div>
+            <div class="kpi kpi-count"><span class="kpiheader">Invoice count</span><span class="kpivalue" th:text="${customerInvoiceTotals.invoiceCount ?: 0}"></span></div>
+            <div class="kpi kpi-financial"><span class="kpiheader">Net amount in base currency</span><span class="kpivalue" th:text="${customerInvoiceTotals.netAmountInBaseCurrency ?: 0}"></span></div>
+        </div>
+
+
+        <h2>Invoices</h2>
+        <table th:unless="${#lists.isEmpty(customerInvoiceBookedCollectionResponse.collection)}">
+            <thead>
+                <tr>
+                    <th>Invoice Number</th>
+                    <th>Recipient Name</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Pdf</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="invoice : ${customerInvoiceBookedCollectionResponse.collection}">
+                    <td th:text="${invoice.bookedInvoiceNumber}"></td>
+                    <td th:text="${invoice.recipient?.name}"></td>
+                    <td th:text="${invoice.date}"></td>
+                    <td th:text="${#numbers.formatDecimal(invoice.netAmountInBaseCurrency, 0, 2)}"></td>
+                    <td><a th:href="@{/customers/{customerNumber}/invoices/{invoiceNumber}/pdf(customerNumber=${customer.customerNumber}, invoiceNumber=${invoice.bookedInvoiceNumber})}" target="_blank" th:if="${invoice.pdf?.download}">PDF</a></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div th:if="${#lists.isEmpty(customerInvoiceBookedCollectionResponse.collection)}">
+            <p>The customer has never been invoiced.</p>
+        </div>
+    </main>
+</th:block>
