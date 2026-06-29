@@ -12,4 +12,4 @@ COPY target/*.jar app.jar
 EXPOSE 10000
 
 # Step 5: Run the jar file cleanly
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=10000"]
