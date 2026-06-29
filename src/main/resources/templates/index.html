@@ -1,7 +1,8 @@
 <th:block th:replace="~{layout/default :: main-layout(~{:: #page-content})}">
     <main id="page-content">
         <h2>Customers</h2>
-        <p>List of e-conomic customers, click on a customer to see additional information for it or click the email to send a email to the customer.</p>
+        <hr/>
+        <p>List of e-conomic customers, click on a customer number or name to see additional information  - Or click on the customer email to send a email to the customer.</p>
         <table th:unless="${#lists.isEmpty(customers)}">
             <thead>
             <tr>
@@ -16,7 +17,13 @@
                 <td><a th:href="@{|/customers/${customer.customerNumber}|}"><span th:text="${customer.customerNumber}"></span></a></td>
                 <td><a th:href="@{|/customers/${customer.customerNumber}|}"><span th:text="${customer.name}"></span></a></td>
                 <td><a th:href="@{|mailto:${customer.email}|}"><span th:text="${customer.email}"></span></a></td>
-                <td><span th:text="${(customer.barred ?: false) ? 'No' : 'Yes'}"></span></td>
+                <td>
+                    <span th:if="${customer.barred}">Barred</span>
+
+                    <span th:unless="${customer.barred}">Status</span>
+                </td>
+
+
             </tr>
             </tbody>
         </table>

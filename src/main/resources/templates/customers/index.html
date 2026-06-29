@@ -1,38 +1,84 @@
 <th:block th:replace="~{layout/default :: main-layout(~{:: #page-content})}">
     <main id="page-content">
-        <h1><span th:text="${customer.name ?: 'Unknown'}"></span> (<span th:text="${customer.customerNumber ?: 'Unknown'}"></span>)</h1>
-        <div class="kpicontainer">
-            <div class="kpi kpi-date"><span class="kpiheader">First invoice</span><span class="kpivalue" th:text="${customerInvoiceTotals.minDate ?: 'Never'}"></span></div>
-            <div class="kpi kpi-date-latest"><span class="kpiheader">Latest invoice</span><span class="kpivalue" th:text="${customerInvoiceTotals.maxDate ?: 'Never'}"></span></div>
-            <div class="kpi kpi-count"><span class="kpiheader">Invoice count</span><span class="kpivalue" th:text="${customerInvoiceTotals.invoiceCount ?: 0}"></span></div>
-            <div class="kpi kpi-financial"><span class="kpiheader">Net amount in base currency</span><span class="kpivalue" th:text="${customerInvoiceTotals.netAmountInBaseCurrency ?: 0}"></span></div>
+        <div class="customer-information" th:object="${customer}">
+            <div class="customer-profile-header">
+                <h2>
+                    <span th:text="*{name}">Customer Name</span>
+                    <small th:text="'(#' + *{customerNumber} + ')'">(#123)</small>
+                </h2>
+                <span th:if="*{barred}" class="badge badge-danger">Barred</span>
+                <span th:unless="*{barred}" class="badge badge-success">Active</span>
+            </div>
+
+            <hr />
+
+            <div class="kpi-container">
+                <div class="kpi kpi-date"><span class="kpiheader">First invoice</span><span class="kpivalue" th:text="${customerInvoiceTotals.minDate ?: 'Never'}"></span></div>
+                <div class="kpi kpi-date-latest"><span class="kpiheader">Latest invoice</span><span class="kpivalue" th:text="${customerInvoiceTotals.maxDate ?: 'Never'}"></span></div>
+                <div class="kpi kpi-count"><span class="kpiheader">Invoice count</span><span class="kpivalue" th:text="${customerInvoiceTotals.invoiceCount ?: 0}"></span></div>
+                <div class="kpi kpi-financial"><span class="kpiheader">Net amount in base currency</span><span class="kpivalue" th:text="${customerInvoiceTotals.netAmountInBaseCurrency ?: 0}"></span></div>
+            </div>
+
+
+            <div class="customer-details-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+
+                <div class="details-section">
+                    <h3>Financial & Account Summary</h3>
+                    <ul>
+                        <li><strong>Balance:</strong> <span th:text="*{balance} != null ? *{balance} + ' ' + *{currency} : '0.00 ' + *{currency}">0.00 DKK</span></li>
+                        <li><strong>Due Amount:</strong> <span th:text="*{dueAmount} != null ? *{dueAmount} + ' ' + *{currency} : '0.00 ' + *{currency}">0.00 DKK</span></li>
+                        <li><strong>Credit Limit:</strong> <span th:text="*{creditLimit} != null ? *{creditLimit} + ' ' + *{currency} : 'No Limit'">Unlimited</span></li>
+                        <li th:if="*{vatNumber}"><strong>VAT Number:</strong> <span th:text="*{vatNumber}">DK12345678</span></li>
+                        <li th:if="*{ean}"><strong>EAN:</strong> <span th:text="*{ean}">5790000000001</span></li>
+                        <li th:if="*{customerGroup}"><strong>Group No:</strong> <span th:text="*{customerGroup.customerGroupNumber}">1</span></li>
+                    </ul>
+                </div>
+
+                <div class="details-section">
+                    <h3>Contact & Location</h3>
+                    <ul>
+                        <li><strong>Email:</strong> <a th:href="'mailto:' + *{email}" th:text="*{email}">customer@mail.com</a></li>
+                        <li th:if="*{telephoneAndFaxNumber}"><strong>Phone:</strong> <span th:text="*{telephoneAndFaxNumber}">+45 00 00 00 00</span></li>
+                        <li th:if="*{mobilePhone}"><strong>Mobile:</strong> <span th:text="*{mobilePhone}">+45 00 00 00 00</span></li>
+                        <li th:if="*{website}"><strong>Website:</strong> <a th:href="*{website}" target="_blank" th:text="*{website}">www.customer.com</a></li>
+                        <li>
+                            <strong>Address:</strong>
+                            <address style="font-style: normal; margin-top: 0.25rem;">
+                                <span th:text="*{address}">123 Street Name</span><br/>
+                                <span th:if="*{zip} or *{city}"><span th:text="*{zip}">1000</span> <span th:text="*{city}">Copenhagen</span><br/></span>
+                                <span th:text="*{country}">Denmark</span>
+                            </address>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+
+            <div class="details-section" th:unless="${#lists.isEmpty(customerInvoiceBookedCollectionResponse.collection)}">
+                <h3>Invoices</h3>
+                <table >
+                    <thead>
+                    <tr>
+                        <th>Invoice Number</th>
+                        <th>Recipient Name</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Download PDF</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="invoice : ${customerInvoiceBookedCollectionResponse.collection}">
+                        <td th:text="${invoice.bookedInvoiceNumber}"></td>
+                        <td th:text="${invoice.recipient?.name}"></td>
+                        <td th:text="${invoice.date}"></td>
+                        <td th:text="${#numbers.formatDecimal(invoice.netAmountInBaseCurrency, 0, 2)}"></td>
+                        <td><a th:href="@{/customers/{customerNumber}/invoices/{invoiceNumber}/pdf(customerNumber=${customer.customerNumber}, invoiceNumber=${invoice.bookedInvoiceNumber})}" target="_blank" th:if="${invoice.pdf?.download}">📑</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
 
-        <h2>Invoices</h2>
-        <table th:unless="${#lists.isEmpty(customerInvoiceBookedCollectionResponse.collection)}">
-            <thead>
-                <tr>
-                    <th>Invoice Number</th>
-                    <th>Recipient Name</th>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Pdf</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="invoice : ${customerInvoiceBookedCollectionResponse.collection}">
-                    <td th:text="${invoice.bookedInvoiceNumber}"></td>
-                    <td th:text="${invoice.recipient?.name}"></td>
-                    <td th:text="${invoice.date}"></td>
-                    <td th:text="${#numbers.formatDecimal(invoice.netAmountInBaseCurrency, 0, 2)}"></td>
-                    <td><a th:href="@{/customers/{customerNumber}/invoices/{invoiceNumber}/pdf(customerNumber=${customer.customerNumber}, invoiceNumber=${invoice.bookedInvoiceNumber})}" target="_blank" th:if="${invoice.pdf?.download}">PDF</a></td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div th:if="${#lists.isEmpty(customerInvoiceBookedCollectionResponse.collection)}">
-            <p>The customer has never been invoiced.</p>
-        </div>
     </main>
 </th:block>
