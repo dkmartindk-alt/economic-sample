@@ -6,6 +6,8 @@ A simple Java web application that showcases integration with the e-conomic API,
 
 This application provides a basic example of consuming the e-conomic REST API. It shows a simple overview of customers and allows users to drill down into individual customers to view their total sales and invoices, with the ability to download invoice PDFs.
 
+You can view the live demo here: **[Live Demo](https://p01--economic-sample--vw2y8lk4rdww.code.run/)** *Note: The demo is hosted on Northflank's free tier, so the initial load might take a few moments if the container needs to wake up.*
+
 **Note**: This showcase is intended for demonstration purposes only and does not include production-ready error handling, security features, or optimizations for large datasets.
 
 ## Features
