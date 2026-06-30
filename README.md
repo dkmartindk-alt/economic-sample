@@ -10,6 +10,8 @@ You can view the live demo here: **[Live Demo](https://p01--economic-sample--vw2
 
 **Note**: This showcase is intended for demonstration purposes only and does not include production-ready error handling, security features, or optimizations for large datasets.
 
+**Database:** I decided not to use a database for the app since it is so small, but I mainly have used JPA / Hibernate.
+
 ## Features
 
 - Browse a list of customers from e-conomic API 
